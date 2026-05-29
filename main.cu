@@ -2,18 +2,30 @@
 #include "device_launch_parameters.h"
 #include <stdio.h>
 
-// CUDA keywords
-// __host__ : called from CPU, executed on CPU
-// __device__ : called from GPU, executed on GPU
-// __global__ : called from CPU, executed on GPU
-__global__ void helloCUDA(void) {
-  printf("Hello CUDA from GPU!\n");
+void checkDeviceMemory() {
+  size_t free, total;
+  cudaMemGetInfo(&free, &total);
+  printf("Device memory (free/total) = %lld / %lld bytes\n", free, total);
 }
 
 int main(void) {
-  printf("Hello GPU from CPU!\n");
-  // Launch the kernel with 1 block and 10 threads
-  helloCUDA<<<1, 10>>>();
-  
+  int* dDataPtr;
+  cudaError_t errorCode;
+
+  checkDeviceMemory();
+
+  // Allocate 4MB of device memory
+  errorCode = cudaMalloc(&dDataPtr, sizeof(int) * 1024 * 1024);
+  printf("cudaMalloc - %s\n", cudaGetErrorString(errorCode));
+  checkDeviceMemory();
+
+  errorCode = cudaMemset(dDataPtr, 0, sizeof(int) * 1024 * 1024);
+  printf("cudaMemset - %s\n", cudaGetErrorString(errorCode));
+  checkDeviceMemory();
+
+  errorCode = cudaFree(dDataPtr);
+  printf("cudaFree - %s\n", cudaGetErrorString(errorCode));
+  checkDeviceMemory();
+
   return 0;
 }
