@@ -2,30 +2,47 @@
 #include "device_launch_parameters.h"
 #include <stdio.h>
 
-void checkDeviceMemory() {
-  size_t free, total;
-  cudaMemGetInfo(&free, &total);
-  printf("Device memory (free/total) = %lld / %lld bytes\n", free, total);
+__global__ void printData(int* _dDataPtr) {
+  printf("%d", _dDataPtr[threadIdx.x]);
+}
+
+__global__ void setData(int* _dDataPtr) {
+  // threadIdx.x is internal variable that holds the thread index within the block.
+  _dDataPtr[threadIdx.x] = 2;
 }
 
 int main(void) {
+  // Initialize data on host
+  int data[10] = { 0 };
+  for (int i = 0; i < 10; i++) {
+    data[i] = 1;
+  }
+
+  // Allocate memory on device and initialize it to zero
   int* dDataPtr;
-  cudaError_t errorCode;
+  cudaMalloc(&dDataPtr, sizeof(int) * 10);
+  cudaMemset(dDataPtr, 0, sizeof(int) * 10);
 
-  checkDeviceMemory();
+  printf("Data in device: ");
+  printData<<<1, 10>>>(dDataPtr);
 
-  // Allocate 4MB of device memory
-  errorCode = cudaMalloc(&dDataPtr, sizeof(int) * 1024 * 1024);
-  printf("cudaMalloc - %s\n", cudaGetErrorString(errorCode));
-  checkDeviceMemory();
+  // Copy data from host to device and print it
+  cudaMemcpy(dDataPtr, data, sizeof(int) * 10, cudaMemcpyHostToDevice);
+  printf("\nHost -> Device: ");
+  printData<<<1, 10>>>(dDataPtr);
 
-  errorCode = cudaMemset(dDataPtr, 0, sizeof(int) * 1024 * 1024);
-  printf("cudaMemset - %s\n", cudaGetErrorString(errorCode));
-  checkDeviceMemory();
+  // Set data in device
+  setData<<<1, 10>>>(dDataPtr);
 
-  errorCode = cudaFree(dDataPtr);
-  printf("cudaFree - %s\n", cudaGetErrorString(errorCode));
-  checkDeviceMemory();
+  // Copy data from device to host and print it
+  cudaMemcpy(data, dDataPtr, sizeof(int) * 10, cudaMemcpyDeviceToHost);
+  printf("\nDevice -> Host: ");
+  for (int i = 0; i < 10; i++) {
+    printf("%d", data[i]);
+  }
+
+  // Free device memory
+  cudaFree(dDataPtr);
 
   return 0;
 }

@@ -28,4 +28,5 @@ endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
   CUDA_ARCHITECTURES native
+  CUDA_RUNTIME_LIBRARY Shared
 )
