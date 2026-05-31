@@ -12,7 +12,14 @@ set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 
 option(CUDA_TEST_WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
 
-add_executable(${PROJECT_NAME} main.cu)
+add_executable(${PROJECT_NAME}
+  main.cu
+  Common/DS_timer.cpp
+)
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+  Common
+)
 
 target_compile_options(${PROJECT_NAME} PRIVATE
   $<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/W4 /utf-8>
