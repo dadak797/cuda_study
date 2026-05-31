@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemDefinitionGroup Condition="'$(CudaToolkitVersion)' != '' and $([System.String]::Copy('$(CudaToolkitVersion)').StartsWith('v13.'))">
+    <CudaCompile>
+      <CudaRuntime>Hybrid</CudaRuntime>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+</Project>

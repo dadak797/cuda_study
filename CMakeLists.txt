@@ -35,5 +35,13 @@ endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
   CUDA_ARCHITECTURES native
-  CUDA_RUNTIME_LIBRARY Shared
 )
+
+if(WIN32 AND CMAKE_CUDA_COMPILER_VERSION VERSION_GREATER_EQUAL 13.2)
+  # CUDA 13.2+ MSBuild defaults to the hybrid dynamic runtime on Windows.
+  # Directory.Build.targets keeps CMake's VS generator from forcing "Shared".
+else()
+  set_target_properties(${PROJECT_NAME} PROPERTIES
+    CUDA_RUNTIME_LIBRARY Shared
+  )
+endif()
