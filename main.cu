@@ -5,11 +5,13 @@
 #include <string.h>
 #include "Common/DS_timer.h"
 
-#define NUM_DATA 1030
+#define NUM_DATA 1024 * 1024 * 10
 
-__global__ void addVector(int* _dResult, const int* _dSrc1, const int* _dSrc2) {
-  int idx = threadIdx.x;
-  _dResult[idx] = _dSrc1[idx] + _dSrc2[idx];
+__global__ void addVector(int* _dResult, const int* _dSrc1, const int* _dSrc2, int _size) {
+  int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx < _size) {
+    _dResult[idx] = _dSrc1[idx] + _dSrc2[idx];
+  }
 }
 
 int main(void) {
@@ -63,7 +65,9 @@ int main(void) {
 
   // Kernel computation
   timer.onTimer(1);
-  addVector<<<ceil((float)NUM_DATA/1024), 1024>>>(dResult, dSrc1, dSrc2);
+  dim3 dimGrid(static_cast<uint32_t>(ceil(static_cast<float>(NUM_DATA) / 256)), 1, 1);
+  dim3 dimBlock(256, 1, 1);
+  addVector<<<dimGrid, dimBlock>>>(dResult, dSrc1, dSrc2, NUM_DATA);
   cudaDeviceSynchronize();  // Wait for the kernel to finish
   timer.offTimer(1);
 
