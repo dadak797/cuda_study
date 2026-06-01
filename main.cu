@@ -14,6 +14,14 @@ __global__ void addVector(int* _dResult, const int* _dSrc1, const int* _dSrc2, i
   }
 }
 
+__global__ void add2DMatrix(int* _dResult, const int* _dSrc1, const int* _dSrc2) {
+  uint32_t col = threadIdx.x;
+  uint32_t row = threadIdx.y;
+  uint32_t idx = row * blockDim.x + col;
+
+  _dResult[idx] = _dSrc1[idx] + _dSrc2[idx];
+}
+
 int main(void) {
 	// Set timer
 	DS_timer timer(5);
