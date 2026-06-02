@@ -143,6 +143,7 @@ bool MatAddGPU_2D2D(float* _dA, float* _dB, float* _dC)
 		, ThreadLayout::G2D_B2D, grid_dim, block_dim);
 }
 ```
+- 블록의 크기를 (64, 64)로 설정하면 오류가 발생함 (블록 별 최대 thread의 개수가 1024를 넘어가면 안됨). (64, 16)으로 설정하는 것은 가능함
 
 ### 1차원 그리드, 1차원 블록
 ```

@@ -65,19 +65,31 @@ int main(void)
 
 	// *** Kernel call
 	timer.onTimer(5);
-	MatAddGPU_2D2D(dA, dB, dC); cudaDeviceSynchronize();
+	MatAddGPU_2D2D(dA, dB, dC);
+	cudaError_t err2D2D = cudaDeviceSynchronize();
+	if (err2D2D != cudaSuccess) {
+		printf("Error in 2D-2D kernel: %s\n", cudaGetErrorString(err2D2D));
+	}
 	timer.offTimer(5);
+
 	timer.onTimer(3);
 	cudaMemcpy(C[G2D_B2D], dC, sizeof(float)* MAT_SIZE, cudaMemcpyDeviceToHost);
 	timer.offTimer(3);
 
 	timer.onTimer(6);
-	MatAddGPU_1D1D(dA, dB, dC); cudaDeviceSynchronize();
+	MatAddGPU_1D1D(dA, dB, dC);	
+	cudaError_t err1D1D = cudaDeviceSynchronize();
+	if (err1D1D != cudaSuccess) {
+		printf("Error in 1D-1D kernel: %s\n", cudaGetErrorString(err1D1D));
+	}
 	timer.offTimer(6);
 	cudaMemcpy(C[G1D_B1D], dC, sizeof(float)* MAT_SIZE, cudaMemcpyDeviceToHost);
 
 	timer.onTimer(7);
-	MatAddGPU_2D1D(dA, dB, dC); cudaDeviceSynchronize();
+	MatAddGPU_2D1D(dA, dB, dC); cudaError_t err2D1D = cudaDeviceSynchronize();
+	if (err2D1D != cudaSuccess) {
+		printf("Error in 2D-1D kernel: %s\n", cudaGetErrorString(err2D1D));
+	}
 	timer.offTimer(7);
 	cudaMemcpy(C[G2D_B1D], dC, sizeof(float)* MAT_SIZE, cudaMemcpyDeviceToHost);
 
