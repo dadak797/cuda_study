@@ -13,11 +13,14 @@ set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 option(CUDA_TEST_WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
 
 add_executable(${PROJECT_NAME}
-  main.cu
+  main.cpp
   Common/DS_timer.cpp
+  MatAdd_LargeMatrix.cu
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
   Common
 )
 
